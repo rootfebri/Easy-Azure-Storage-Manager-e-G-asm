@@ -1,10 +1,10 @@
 {
-	"productName": "easy-azure-storage-manager",
+	"productName": "Easy Azure Storage Manager",
 	"version": "0.1.0",
 	"identifier": "com.rootfebri.easm",
 	"build": {
 		"beforeDevCommand": "bun run dev --host",
-		"devUrl": "http://localhost:1420",
+		"devUrl": "http://0.0.0.0:1420",
 		"beforeBuildCommand": "bun run build",
 		"frontendDist": "../dist"
 	},
@@ -32,6 +32,57 @@
 			"icons/128x128@2x.png",
 			"icons/icon.icns",
 			"icons/icon.ico"
-		]
+		],
+		"android": {
+			"minSdkVersion": 24
+		},
+		"iOS": {},
+		"linux": {
+			"appimage": {
+				"bundleMediaFramework": false,
+				"files": {}
+			},
+			"deb": {
+				"files": {}
+			},
+			"rpm": {
+				"epoch": 0,
+				"files": {},
+				"release": "1"
+			}
+		},
+		"macOS": {
+			"dmg": {
+				"appPosition": {
+					"x": 180,
+					"y": 170
+				},
+				"applicationFolderPosition": {
+					"x": 480,
+					"y": 170
+				},
+				"windowSize": {
+					"height": 400,
+					"width": 660
+				}
+			},
+			"files": {},
+			"minimumSystemVersion": "10.13"
+		},
+		"windows": {
+			"allowDowngrades": true,
+			"certificateThumbprint": null,
+			"digestAlgorithm": null,
+			"nsis": null,
+			"signCommand": null,
+			"timestampUrl": null,
+			"tsp": false,
+			"webviewFixedRuntimePath": null,
+			"webviewInstallMode": {
+				"silent": true,
+				"type": "downloadBootstrapper"
+			},
+			"wix": null
+		}
 	}
 }

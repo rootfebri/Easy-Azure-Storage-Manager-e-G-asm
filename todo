@@ -6,3 +6,5 @@ TODO:
     - Minor:
         - Hide Show clear button & remove select
         - Remove logoutRedirect for `Revoke Access` button
+    - Important:
+        - Customizeable (Tenant and Client) Microsoft Entra ID at Settings Page
