@@ -57,7 +57,7 @@ export const SubscriptionList:FC<TSubscriptionList> = ({ name, data, setData, se
     return (
         <DropdownMenu onOpenChange={setFetchData}>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline">{selectedSub.id !== "-" ? selectedSub.displayName : name}</Button>
+                <Button variant="outline">{selectedSub.id ? selectedSub.displayName : name}</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className={cn([classWidth, "overflow-auto", "max-h-64"])}>
                 <DropdownMenuLabel>Select {name}</DropdownMenuLabel>
@@ -95,7 +95,7 @@ export const StorageList:FC<TStorageList> = ({name, subscription_id, data, selec
     return (
         <DropdownMenu onOpenChange={setFetchData}>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline">{selectedStorage.id !== "-" ? selectedStorage.name : name}</Button>
+                <Button variant="outline">{selectedStorage.id ? selectedStorage.name : name}</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className={cn([classWidth, "overflow-auto", "max-h-64"])}>
                 <DropdownMenuLabel>Select {name}</DropdownMenuLabel>
@@ -220,9 +220,9 @@ export const CreateStorage: FC<CreateStorageProps> = ({ subscriptionId, open, se
                         </Label>
                         <Label>
                             <h1>
-                                {getActiveRSN().length > 0 ? "Resource Group Name (Got from setting)" : "Enter resource group name"}
+                                {getActiveRSN()?.length > 0 ? "Resource Group Name (Got from setting)" : "Enter resource group name"}
                             </h1>
-                            {getActiveRSN().length > 0 ? (
+                            {getActiveRSN()?.length > 0 ? (
                                 <Input
                                     onChange={(inp) => setResGrpName(inp.currentTarget.value)}
                                     disabled={true}
@@ -293,7 +293,7 @@ export const ContainerList:FC<ContainerListProps & IClassWidht> = (props) => {
     return (
         <DropdownMenu onOpenChange={setFetchData}>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline">Select Container</Button>
+                <Button variant="outline">{currentData?.name ?? "Select Container"}</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className={cn([classWidth, "overflow-auto", "max-h-64"])}>
                 <DropdownMenuLabel>Select {name}</DropdownMenuLabel>
@@ -322,16 +322,35 @@ interface TableActionsProps {
     setStorage: (storage: Storages) => void;
     containers: ListContainer;
     setContainers: (containers: ListContainer) => void;
+    setActiveStorage: (activeStorage: string | null) => void;
+    setActiveContainer: (activeContainer: string | null) => void;
+    setActiveSubscription: (activeSubscription: string | null) => void;
 }
 
-export const TableActions: FC<TableActionsProps> = ({ subscriptions, setSubscriptions, storage, setStorage, containers, setContainers }) => {
-    const [selectedSub, setSelectedSub] = useState<SubscriptionValue>({ id: "-", displayName: "" } as SubscriptionValue);
-    const [selectedStorage, setSelectedStorage] = useState<StorageValue>({ id: "-" } as StorageValue);
-    const [selectedContainer, setSelectedContainer] = useState<ContainerData>();
+export const TableActions: FC<TableActionsProps> = ({
+    subscriptions,
+    setSubscriptions,
+    storage,
+    setStorage,
+    containers,
+    setContainers,
+    setActiveStorage,
+    setActiveContainer,
+    setActiveSubscription,
+}) => {
+    const [selectedSub, setSelectedSub] = useState<SubscriptionValue>({ id: "", displayName: "", subscriptionId: "" } as SubscriptionValue);
+    const [selectedStorage, setSelectedStorage] = useState<StorageValue>({ name: "" } as StorageValue);
+    const [selectedContainer, setSelectedContainer] = useState<ContainerData>({ name: "" } as ContainerData);
     const [openCreateStorage, setOpenCreateStorage] = useState<boolean>(false);
 
+    useEffect(() => {
+        setActiveStorage(selectedStorage.name)
+        setActiveContainer(selectedContainer.name)
+        setActiveSubscription(selectedSub.subscriptionId)
+    }, [selectedStorage, selectedSub, selectedContainer])
+    
     return (
-        <div>
+        <div className="flex items-center gap-4 rounded-xl">
             <CreateStorage
                 open={openCreateStorage}
                 setOpen={setOpenCreateStorage}
