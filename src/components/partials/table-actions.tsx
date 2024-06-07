@@ -1,6 +1,6 @@
 import {DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger} from "@/components/ui/dropdown-menu.tsx"
 import {Button} from "@/components/ui/button.tsx"
-import {cn, getAccessToken, getActiveRSN, setActiveSharedKey} from "@/lib/utils.ts"
+import {cn, getAccessToken, getActiveRSN} from "@/lib/utils.ts"
 import {ClassValue} from "clsx"
 import {FC, useEffect, useState} from "react"
 import {Storages, StorageValue, Subscriptions, SubscriptionValue} from "@/azure"
@@ -12,7 +12,6 @@ import {Label} from "@/components/ui/label.tsx"
 import {Input} from "@/components/ui/input.tsx"
 import {LoadingSpinner} from "@/components/partials/LoadingSpinner.tsx"
 import delay from "delay"
-import {ListKeys} from "@/types/storage/list-keys";
 import {ListContainer, ContainerData} from "@/types/storage/list-container";
 
 interface IClassWidht {
@@ -83,14 +82,6 @@ export const SubscriptionList:FC<TSubscriptionList> = ({ name, data, setData, se
 
 export const StorageList:FC<TStorageList> = ({name, subscription_id, data, selectedStorage, setData, setSelectedStorage, openCreateStorage, classWidth}) => {
     const [fetchData, setFetchData] = useState<boolean>(false)
-    const [fetchKey, setFetchKey] = useState<boolean>(false)
-
-    const [resourceGroupName, setResourceGroupName] = useState(getActiveRSN())
-    useEffect(() => {
-        const localResName = getActiveRSN()
-        if (localResName.length > 0)
-            setResourceGroupName(localResName)
-    }, [getActiveRSN()]);
 
     useEffect(() => {
         if (fetchData) {
@@ -100,17 +91,6 @@ export const StorageList:FC<TStorageList> = ({name, subscription_id, data, selec
                 .finally(() => setFetchData(false))
         }
     }, [fetchData])
-    useEffect(() => {
-        if (fetchKey && selectedStorage.name.length > 0 && resourceGroupName.length > 0) {
-            const accountName = selectedStorage.name
-            const subscriptionId = subscription_id
-            const accessToken = getAccessToken()
-            const url = `https://management.azure.com/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.Storage/storageAccounts/${accountName}/listKeys?api-version=2023-01-01`
-            invoke('get_shared_key', { access_token: accessToken, url: url })
-                .then((res) => setActiveSharedKey((res as ListKeys).keys[0].value ?? (res as ListKeys).keys[1].value))
-                .catch(err => toast.info(err.message ?? err))
-        }
-    }, [fetchKey]);
 
     return (
         <DropdownMenu onOpenChange={setFetchData}>
@@ -124,7 +104,6 @@ export const StorageList:FC<TStorageList> = ({name, subscription_id, data, selec
                     data.value.map((storage) => {
                         if (storageName === storage.name) {
                             setSelectedStorage(storage)
-                            setFetchKey(true)
                         }
                     })
                 }}>

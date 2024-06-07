@@ -1,6 +1,0 @@
-### Get list of subscription by ID
-###
-
-@accessToken = eyJ0eXAiOiJKV1QiLCJhbGciOiJ....
-GET https://management.azure.com/subscriptions?api-version=2016-06-01
-Authorization: Bearer {{accessToken}}

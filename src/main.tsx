@@ -22,9 +22,9 @@ const pca = new PublicClientApplication({
 pca.addEventCallback(e => {
     if (e.eventType === EventType.LOGIN_SUCCESS) {
         // @ts-ignore
-        pca.setActiveAccount(e.payload.account)
+        pca.setActiveAccount(e.payload?.account)
         // @ts-ignore
-        setAccessToken(e.payload.accessToken)
+        setAccessToken(e.payload?.accessToken)
     }
 })
 

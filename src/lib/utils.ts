@@ -20,7 +20,3 @@ export const getActiveRSN = (): string => {
 export const setActiveRSN = (value: string) => {
     localStorage.setItem(import.meta.env.VITE_RSC_STORAGE_KEY, value)
 }
-
-export const setActiveSharedKey = (value: string): void => {
-    localStorage.setItem(import.meta.env.VITE_CTRKEY_STORAGE_KEY, value)
-}
