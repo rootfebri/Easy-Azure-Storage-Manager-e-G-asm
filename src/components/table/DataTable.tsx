@@ -15,6 +15,7 @@ import { TStateFn } from "@/types";
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
+    uploadBtnState: boolean
     fileLoader: TStateFn<boolean>
     setData: TStateFn<TData[]>
     setIsUploading: TStateFn<boolean>
@@ -23,7 +24,7 @@ interface DataTableProps<TData, TValue> {
     setActiveContainer: TStateFn<string | null>
 }
 
-export const DataTable = <TData, TValue>({columns, data, fileLoader, setData, setIsUploading, setActiveSubscription, setActiveStorage, setActiveContainer}: DataTableProps<TData, TValue>) => {
+export const DataTable = <TData, TValue>({columns, data, uploadBtnState, fileLoader, setData, setIsUploading, setActiveSubscription, setActiveStorage, setActiveContainer}: DataTableProps<TData, TValue>) => {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -86,7 +87,7 @@ export const DataTable = <TData, TValue>({columns, data, fileLoader, setData, se
                     setActiveContainer={setActiveContainer}
                 />
                 <div className="flex items-center gap-4">
-                    <UploadAll setIsUploading={setIsUploading} />
+                    <UploadAll disabled={uploadBtnState} setIsUploading={setIsUploading} />
                     <ClearSelected data={data} selected={selectedDataForClearSelected} setData={setData} />
                 </div>
             </div>

@@ -1,4 +1,4 @@
-use chrono::{Duration, Utc};
+use chrono::{Duration, SecondsFormat, Timelike, Utc};
 use reqwest::{Body, Client};
 
 use crate::azure::{BodyForSas, ContainerCreated, CreateContainerBody, ListContainers, Props, SasToken};
@@ -119,7 +119,11 @@ pub async fn put_blob(full_path_to_file: String, url: String) -> u16 {
         .expect("error while uploading file");
 
     // Return the HTTP status code of the response
-    response.status().as_u16()
+    let code = response
+        .status()
+        .as_u16();
+    println!("HTTP status code: {}", code);
+    code
 }
 
 /// Generates a Shared Access Signature (SAS) token for a specified Azure Storage account.
@@ -143,7 +147,7 @@ pub async fn put_blob(full_path_to_file: String, url: String) -> u16 {
 #[tauri::command(rename_all = "snake_case")]
 pub async fn generate_sas(storage: String, res: String, sub: String, access_token: String) -> Result<SasToken, ErrorResponse> {
     let client = Client::new();
-    let (start, expire) = generate_signed_times(12, 1);
+    let (start, expire) = generate_signed_times(2, 0);
     let url = format!("https://management.azure.com/subscriptions/{}/resourceGroups/{}/providers/Microsoft.Storage/storageAccounts/{}/ListAccountSas?api-version=2023-01-01", sub, res, storage);
 
     let request = client
@@ -200,12 +204,13 @@ pub async fn generate_sas(storage: String, res: String, sub: String, access_toke
 /// ```
 fn generate_signed_times(hours_ahead: i64, days_ahead: i64) -> (String, String) {
     let now = Utc::now();
-    let signed_start = now.to_rfc3339();
+    let signed_start = now.with_second(0).unwrap().with_nanosecond(0).unwrap().to_rfc3339_opts(SecondsFormat::Secs, true);
 
     let expiry_date = now
         + Duration::hours(hours_ahead)
         + Duration::days(days_ahead);
-    let signed_expiry = expiry_date.to_rfc3339();
+    let signed_expiry = expiry_date.with_second(0).unwrap().with_nanosecond(0).unwrap().to_rfc3339_opts(SecondsFormat::Secs, true);
+    println!("Start: {}, Expiry: {}", signed_start, signed_expiry);
 
     (signed_start, signed_expiry)
 }

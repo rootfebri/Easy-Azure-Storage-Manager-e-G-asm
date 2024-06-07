@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import {DataTable} from "@/components/table/DataTable";
 import {columns} from "@/components/table/columns";
-import { basename, putBlob, setSasToken } from "@/lib/utils";
+import { basename, getSasToken, setSasToken } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
+import { toast } from "sonner";
 
 export type TData = {
     file: string | "";
@@ -20,7 +21,7 @@ const Home = () => {
     const [activeContainer, setActiveContainer] = useState<string | null>(null);
 
     const loadData = async () => {
-        const newData: TData[] = await invoke("loadfile");
+        const newData: TData[] = await invoke("load_file");
 
         setData((prevState) => {
             const newState = [...prevState];
@@ -44,6 +45,11 @@ const Home = () => {
     useEffect(() => {
         if (isUploading && data.length > 0 && activeStorage && activeSubscription && activeContainer) {
             setIsUploading(false)
+
+            // TODO: Implement for token is it expired
+            // if (getSasToken().length < 10) {
+            //     setSasToken(activeStorage, activeSubscription)
+            // }
             setSasToken(activeStorage, activeSubscription)
 
             data.map((fileToUpload) => {
@@ -54,29 +60,50 @@ const Home = () => {
                     return item;
                 }))
 
-                const status = putBlob(activeStorage, activeContainer, fileToUpload.file)
-                if (status >= 200 && status <= 209) {
-                    setData((prevState) => prevState.map((item) => {
-                        if (item.file === fileToUpload.file) {
-                            return { ...item, status: 'uploaded', url: `https://${activeStorage}.blob.storage.azure.com/${activeContainer}/${basename(fileToUpload.file)}` }
+                const fileName = basename(fileToUpload.file)
+                const url = `https://${activeStorage}.blob.core.windows.net/${activeContainer}/${fileName}`
+
+                invoke('put_blob', { url: `${url}?${getSasToken()}`, full_path_to_file: fileToUpload.file })
+                    .then((resp) => {
+                        // Success status
+                        if (resp as number >= 200 && resp as number <= 209) {
+                            setData((prevState) => prevState.map((item) => {
+                                if (item.file === fileToUpload.file) {
+                                    return { ...item, status: 'uploaded', url: url }
+                                }
+                                return item;
+                            }))
                         }
-                        return item;
-                    }))
-                } else {
-                    setData((prevState) => prevState.map((item) => {
-                        if (item.file === fileToUpload.file) {
-                            return { ...item, status: 'failed', url: '-' }
+                        // Error status
+                        else {
+                            setData((prevState) => prevState.map((item) => {
+                                if (item.file === fileToUpload.file) {
+                                    return { ...item, status: 'failed', url: '-' }
+                                }
+                                return item;
+                            }))
+
+                            throw new Error(resp as string)
                         }
-                        return item;
-                    }))
-                }
+                    })
+                    // Catch all
+                    .catch((error) => {
+                        const message = `Error uploading ${fileToUpload.file} to ${activeStorage}: ${error.message ?? error}`
+                        toast.error(message)
+                    })
             })
         }
     }, [isUploading]);
 
+    const [onlyLoaded, setOnlyLoaded] = useState<number>(0);
+    useEffect(() => {
+        setOnlyLoaded(data.filter((item) => item.status === 'loaded').length)
+    }, [data]);
+    
     return (
         <div className="container">
             <DataTable
+            uploadBtnState={isUploading || data.length < 1 || !activeStorage || !activeSubscription || !activeContainer || onlyLoaded < 1}
             data={data}
             columns={columns as ColumnDef<typeof data[0], any>[]}
             fileLoader={setLoadFile}

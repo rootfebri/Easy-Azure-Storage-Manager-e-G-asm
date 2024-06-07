@@ -17,7 +17,7 @@ pub fn load_file() -> Vec<LoadedFiles> {
         .map(|f| {
             LoadedFiles {
                 file: f.to_str().unwrap().to_string(),
-                status: "Loaded".to_string(),
+                status: "loaded".to_string(),
                 url: "".to_string()
             }
         })

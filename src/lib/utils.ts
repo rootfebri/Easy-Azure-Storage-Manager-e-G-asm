@@ -22,7 +22,7 @@ export const setActiveRSN = (value: string) => {
     localStorage.setItem(import.meta.env.VITE_RSC_STORAGE_KEY, value)
 }
 
-const getSasToken = (): string => {
+export const getSasToken = (): string => {
     return <string>localStorage.getItem(import.meta.env.VITE_SAS_STORAGE_KEY)
 }
 

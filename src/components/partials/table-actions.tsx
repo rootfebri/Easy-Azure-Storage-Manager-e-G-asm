@@ -293,7 +293,7 @@ export const ContainerList:FC<ContainerListProps & IClassWidht> = (props) => {
     return (
         <DropdownMenu onOpenChange={setFetchData}>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline">{currentData?.name ?? "Select Container"}</Button>
+                <Button variant="outline">{currentData?.name || "Select Container"}</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className={cn([classWidth, "overflow-auto", "max-h-64"])}>
                 <DropdownMenuLabel>Select {name}</DropdownMenuLabel>
@@ -305,7 +305,7 @@ export const ContainerList:FC<ContainerListProps & IClassWidht> = (props) => {
                     <DropdownMenuSeparator/>
                     {fetchData && <LoadingSpinner/>}
                     {containers?.value?.map(container => (
-                        <DropdownMenuRadioItem value={container.name}>{container.name}</DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem key={container.id} value={container.name}>{container.name}</DropdownMenuRadioItem>
                     ))}
                 </DropdownMenuRadioGroup>
             </DropdownMenuContent>

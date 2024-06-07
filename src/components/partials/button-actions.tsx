@@ -12,19 +12,20 @@ export const ClearSelected = <TData,>({data, selected, setData}: ClearSelectedPr
     }
 
     return (
-        <Button variant="destructive" size='sm' onClick={clearSelected}>Clear Selected</Button>
+        <Button disabled={selected.length < 1} variant="destructive" size='sm' onClick={clearSelected}>Clear Selected</Button>
     )
 }
 
 interface UploadAllProps<TValue> {
+    disabled: boolean
     setIsUploading: TStateFn<TValue>
 }
-export const UploadAll = <TValue,>({setIsUploading}: UploadAllProps<TValue>) => {
+export const UploadAll = <TValue,>({disabled, setIsUploading}: UploadAllProps<TValue>) => {
     const uploadAll = () => {
         setIsUploading(true as TValue)
     }
 
     return (
-        <Button variant="secondary" size='sm' onClick={uploadAll}>Upload ALL</Button>
+        <Button disabled={disabled} variant="secondary" size='sm' onClick={uploadAll}>Upload ALL</Button>
     )
 }
