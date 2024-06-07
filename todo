@@ -1,0 +1,8 @@
+TODO:
+    - Major:
+        - Migrate from local storage to SurrealDB
+        - Customize view
+        - Create container Modal & functionality
+    - Minor:
+        - Hide Show clear button & remove select
+        - Remove logoutRedirect for `Revoke Access` button
