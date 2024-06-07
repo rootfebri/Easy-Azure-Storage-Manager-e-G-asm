@@ -1,38 +1,37 @@
 {
-  "productName": "easy-azure-storage-manager",
-  "version": "0.1.0",
-  "identifier": "com.rootfebri.easy-azure-storage-manager",
-  "build": {
-    "beforeDevCommand": "bun run dev",
-    "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "bun run build",
-    "frontendDist": "../dist"
-  },
-  "app": {
-    "windows": [
-      {
-        "title": "Easy Azure Storage Manager",
-        "width": 700,
-        "height": 800,
-        "fullscreen": false,
-        "resizable": false,
-        "alwaysOnTop": false,
-        "theme": "Dark"
-      }
-    ],
-    "security": {
-      "csp": null
-    }
-  },
-  "bundle": {
-    "active": true,
-    "targets": "all",
-    "icon": [
-      "icons/32x32.png",
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
-      "icons/icon.icns",
-      "icons/icon.ico"
-    ]
-  }
+	"productName": "easy-azure-storage-manager",
+	"version": "0.1.0",
+	"identifier": "com.rootfebri.easm",
+	"build": {
+		"beforeDevCommand": "bun run dev",
+		"devUrl": "http://localhost:1420",
+		"beforeBuildCommand": "bun run build",
+		"frontendDist": "../dist"
+	},
+	"app": {
+		"windows": [
+			{
+				"title": "Easy Azure Storage Manager",
+				"width": 700,
+				"height": 800,
+				"fullscreen": false,
+				"resizable": false,
+				"theme": "Dark"
+			}
+		],
+		"security": {
+			"csp": null
+		}
+	},
+	"bundle": {
+		"active": true,
+		"targets": "all",
+		"icon": [
+			"icons/32x32.png",
+			"icons/128x128.png",
+			"icons/128x128@2x.png",
+			"icons/icon.icns",
+			"icons/icon.ico"
+		]
+	}
 }
