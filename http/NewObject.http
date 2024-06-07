@@ -1,0 +1,18 @@
+# This part should be on the input parameter of Rust api Function that got from frontend (Form).
+@storageName = hashkelllearning
+@containerName = $web
+@fileName = blobfilename.ext
+
+PUT https://{{storageName}}.blob.core.windows.net/{{containerName}}/{{fileName}}
+Content-Type: application/json
+
+{
+	"properties": {
+		"publicAccess": "Blob"
+	}
+}
+
+### Success = Response Code: 201 body: (inside NewContainer.reponse.json) <-< is Example
+### Success(Already Has The Container) = Response Code: 201 body: (inside NewContainer.reponse.json) <-< is Example
+### Failed = Response Code: non-200 body: (See below)
+###         {"error":{"code":"ResourceGroupNotFound","message":"message value in here"}} <-< Only shiw message on the frontend
