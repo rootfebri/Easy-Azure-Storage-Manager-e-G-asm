@@ -3,6 +3,24 @@
 version = 3
 
 [[package]]
+name = "Easm-V1"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "base64 0.22.1",
+ "chrono",
+ "hmac",
+ "reqwest",
+ "rfd",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0-pre.3",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-shell",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -931,24 +949,6 @@ name = "dyn-clone"
 version = "1.0.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0d6ef0072f8a535281e4876be788938b528e9a1d43900b82c2569af7da799125"
-
-[[package]]
-name = "easy-azure-storage-manager"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "base64 0.22.1",
- "chrono",
- "hmac",
- "reqwest",
- "rfd",
- "serde",
- "serde_json",
- "sha2 0.11.0-pre.3",
- "tauri",
- "tauri-build",
- "tauri-plugin-shell",
-]
 
 [[package]]
 name = "embed-resource"
