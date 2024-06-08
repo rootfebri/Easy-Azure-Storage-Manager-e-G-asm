@@ -11,7 +11,7 @@ TODO:
     - Model
         • Resource Group Name
             •• name
-        • Shared Access Signatur (SAS)
+        • Shared Access Signature (SAS)
             •• token
             •• created_at
             •• expired_at
