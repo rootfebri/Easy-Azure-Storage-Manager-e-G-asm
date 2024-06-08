@@ -9,9 +9,18 @@ TODO:
     - Important:
         • Customizeable (Tenant and Client) Microsoft Entra ID at Settings Page `src/routes/settings.tsx`
     - Model
-        • Application
-            ••
-        • Azure
-            ••
+        • Resource Group Name
+            •• name
+        • Shared Access Signatur (SAS)
+            •• token
+            •• created_at
+            •• expired_at
+        • Access Token
+            •• access_token
+            •• created_at
+            •• expired_at
+        • Azure Entra ID
+            •• client_id
+            •• tenant_id
         • Account?
             ••
