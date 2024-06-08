@@ -1,10 +1,17 @@
 TODO:
     - Major:
-        - Migrate from local storage to SurrealDB
-        - Customize view
-        - Create container Modal & functionality
+        • Customize view
+        • Migrate from local storage to SurrealDB
+        • Create container Modal & functionality
     - Minor:
-        - Hide Show clear button & remove select
-        - Remove logoutRedirect for `Revoke Access` button
+        • Hide Show clear button & remove select `src/routes/home.tsx` `src/components/table/DataTable.tsx`
+        • Remove logoutRedirect for `Revoke Access` button `src/routes/settings.tsx`
     - Important:
-        - Customizeable (Tenant and Client) Microsoft Entra ID at Settings Page
+        • Customizeable (Tenant and Client) Microsoft Entra ID at Settings Page `src/routes/settings.tsx`
+    - Model
+        • Application
+            ••
+        • Azure
+            ••
+        • Account?
+            ••
