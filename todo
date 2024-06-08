@@ -8,7 +8,7 @@ TODO:
         • Remove logoutRedirect for `Revoke Access` button `src/routes/settings.tsx`
     - Important:
         • Customizeable (Tenant and Client) Microsoft Entra ID at Settings Page `src/routes/settings.tsx`
-    - Model
+    - Database Model
         • Resource Group Name
             •• name
         • Shared Access Signature (SAS)
