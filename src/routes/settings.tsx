@@ -35,7 +35,7 @@ const Setting = () => {
             <div className="flex flex-col gap-y-4 w-full border border-grey-400 rounded p-10">
                 <Label className="w-full space-y-2 my-2">
                     <h1>Access Token</h1>
-                    <Input disabled className="w-[50%] space-2 truncate" value={getAccessToken()}/>
+                    <Input disabled className="w-[50%] space-2 truncate" value={getAccessToken() || ""}/>
                     {!isAuthenticated
                         ? <Button onClick={handleLogin}>Get Access Token</Button>
                         : <Button variant="destructive" onClick={handleRevoke}>Revoke Access</Button>
@@ -43,18 +43,18 @@ const Setting = () => {
                 </Label>
                 <Label className="w-full space-y-2 my-2">
                     <h1>Resource Groups</h1>
-                    <Input className="w-[50%] space-2" value={rcGetActiveRSN} onChange={(e) => setRCActiveRSN(e.target.value)}/>
+                    <Input className="w-[50%] space-2" value={rcGetActiveRSN || ""} onChange={(e) => setRCActiveRSN(e.target.value)}/>
                 </Label>
             </div>
 
             <div className="flex flex-col gap-y-4 w-full border border-grey-400 rounded p-10">
                 <Label className="w-full space-y-2 my-2">
                     <h1>Access Token</h1>
-                    <Input disabled className="w-[50%] space-2 truncate" value={getAccessToken()}/>
+                    <Input disabled className="w-[50%] space-2 truncate" value={getAccessToken() || ""}/>
                 </Label>
                 <Label className="w-full space-y-2 my-2">
                     <h1>Resource Group Name</h1>
-                    <Input disabled className="w-[50%] space-2" value={rcGetActiveRSN ?? getActiveRSN()}/>
+                    <Input disabled className="w-[50%] space-2" value={rcGetActiveRSN || getActiveRSN() || ""}/>
                 </Label>
             </div>
         </div>

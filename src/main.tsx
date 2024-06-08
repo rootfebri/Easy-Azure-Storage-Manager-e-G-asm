@@ -13,7 +13,7 @@ import {setAccessToken} from "./lib/utils"
 
 const pca = new PublicClientApplication({
     auth: {
-        clientId: import.meta.env.VITE_APPLICATION_CLIENT_ID as string,
+        clientId: import.meta.env.VITE_APPLICATION_CLIENT_ID,
         authority: `https://login.microsoftonline.com/${import.meta.env.VITE_APPLICATION_TENANT_ID}`,
         redirectUri: '/',
     },
