@@ -10,6 +10,9 @@ import {ThemeProvider} from "@/provider/theme.tsx"
 import {AuthProvider} from "./context/AuthContext"
 import {EventType, PublicClientApplication} from "@azure/msal-browser"
 import {setAccessToken} from "./lib/utils"
+import {restoreStateCurrent, saveWindowState, StateFlags} from "@tauri-apps/plugin-window-state";
+saveWindowState(StateFlags.ALL)
+restoreStateCurrent(StateFlags.ALL)
 
 const pca = new PublicClientApplication({
     auth: {
