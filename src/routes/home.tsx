@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
-import { invoke } from "@tauri-apps/api/core";
-import {DataTable} from "@/components/table/DataTable";
+import {open} from "@tauri-apps/plugin-dialog";
+import {toast} from "sonner";
+import {invoke} from "@tauri-apps/api/core";
 import {columns} from "@/components/table/columns";
-import { basename, getSasToken, setSasToken } from "@/lib/utils";
-import { ColumnDef } from "@tanstack/react-table";
-import { toast } from "sonner";
+import {DataTable} from "@/components/table/DataTable";
+import {ColumnDef} from "@tanstack/react-table";
+import {useEffect, useState} from "react";
+import {basename, getSasToken, setSasToken} from "@/lib/utils";
 
 export type TData = {
     file: string | "";
@@ -15,31 +16,39 @@ export type TData = {
 const Home = () => {
     const [data, setData] = useState<TData[]>([]);
     const [loadFile, setLoadFile] = useState<true | false>(false);
+    const [onlyLoaded, setOnlyLoaded] = useState<number>(0);
     const [isUploading, setIsUploading] = useState<boolean>(false);
-    const [activeSubscription, setActiveSubscription] = useState<string | null>(null);
     const [activeStorage, setActiveStorage] = useState<string | null>(null);
     const [activeContainer, setActiveContainer] = useState<string | null>(null);
+    const [activeSubscription, setActiveSubscription] = useState<string | null>(null);
 
-    const loadData = async () => {
-        const newData: TData[] = await invoke("load_file");
+    const openFileLoader = async () => {
+        const files = await open({
+            multiple: true,
+            title: "Select Files",
+            filters: [{
+                extensions: ["html", "html5", "htm"],
+                name: ""
+            }],
+            defaultPath: ".",
+        });
 
         setData((prevState) => {
             const newState = [...prevState];
-            newData.forEach((newItem) => {
-                if (!newState.some(item => item.file === newItem.file && item.status === newItem.status)) {
-                    newState.push(newItem);
+            files?.forEach((newItem) => {
+                if (!newState.some(item => item.file === newItem.path)) {
+                    newState.push({
+                        file: newItem.path,
+                        status: "loaded",
+                        url: "-",
+                    });
                 }
             });
-
             return newState;
         });
     }
-
     useEffect(() => {
-        if (loadFile) {
-            loadData()
-                .finally(() => setLoadFile(false));
-        }
+        if (loadFile) openFileLoader().finally(() => setLoadFile(false));
     }, [loadFile]);
     
     useEffect(() => {
@@ -95,11 +104,10 @@ const Home = () => {
         }
     }, [isUploading]);
 
-    const [onlyLoaded, setOnlyLoaded] = useState<number>(0);
     useEffect(() => {
         setOnlyLoaded(data.filter((item) => item.status === 'loaded').length)
     }, [data]);
-    
+
     return (
         <div className="container">
             <DataTable

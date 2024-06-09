@@ -23,4 +23,3 @@ pub struct Properties {
     pub allow_shared_key_access: bool,
     pub minimum_tls_version: String,
 }
-

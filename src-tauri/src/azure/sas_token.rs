@@ -15,5 +15,5 @@ pub struct BodyForSas {
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SasToken {
-    pub account_sas_token: String
+    pub account_sas_token: String,
 }

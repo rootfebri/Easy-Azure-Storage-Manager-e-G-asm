@@ -1,7 +1,7 @@
-use reqwest::Client;
-use reqwest::header::HeaderMap;
-use serde::{Deserialize, Serialize};
 use crate::error::ErrorResponse;
+use reqwest::header::HeaderMap;
+use reqwest::Client;
+use serde::{Deserialize, Serialize};
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -19,7 +19,10 @@ pub struct Key {
 }
 
 #[tauri::command(rename_all = "snake_case")]
-pub async fn get_shared_key(access_token: String, url: String) -> Result<SharedKeyResponse, ErrorResponse> {
+pub async fn get_shared_key(
+    access_token: String,
+    url: String,
+) -> Result<SharedKeyResponse, ErrorResponse> {
     let client = Client::new();
     let mut headers = HeaderMap::new();
     headers.insert("Content-Type", "application/json".parse().unwrap());

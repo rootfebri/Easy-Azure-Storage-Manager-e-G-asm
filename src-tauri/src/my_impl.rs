@@ -1,9 +1,9 @@
-use crate::error::{Errors, ErrorResponse};
-use std::fmt;
+use crate::azure::{CreateContainerBody, NewStorageData};
+use crate::error::{ErrorResponse, Errors};
 use anyhow::Error;
 use reqwest::Body;
+use std::fmt;
 use tauri::ipc::InvokeError;
-use crate::azure::{CreateContainerBody, NewStorageData};
 
 impl fmt::Display for ErrorResponse {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -23,7 +23,7 @@ impl From<reqwest::Error> for ErrorResponse {
             error: Errors {
                 code: "Request Failed".to_string(),
                 message: err.to_string(),
-            }
+            },
         }
     }
 }

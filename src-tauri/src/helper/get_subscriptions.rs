@@ -1,7 +1,8 @@
 use crate::azure::subscription_list::SubscriptionList;
 use crate::error::ErrorResponse;
 
-const SUBSCRIPTION_ENDPOINT: &str = "https://management.azure.com/subscriptions?api-version=2024-03-01";
+const SUBSCRIPTION_ENDPOINT: &str =
+    "https://management.azure.com/subscriptions?api-version=2024-03-01";
 
 #[tauri::command]
 pub async fn get_subscriptions(access_token: String) -> Result<SubscriptionList, ErrorResponse> {
