@@ -25,12 +25,12 @@
   - `token`
   - `created_at`
   - `expired_at`
-- Access Token
+- [x] Access Token
   - [x] `access_token`
   - [x] `created_at`
   - [x] `expired_on`
-- Azure Entra ID
-  - `client_id`
-  - `tenant_id`
+- [x] Azure Entra ID
+  - [x] `client_id`
+  - [x] `tenant_id`
 - Account?
   - (No details provided)
