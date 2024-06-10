@@ -1,23 +1,23 @@
 ## Major Tasks
 
 - [ ] Customize view
-- [ ] Migrate from local storage to SurrealDB
+- [x] Migrate from local storage to Tauri Plugin Store
 - [ ] Create container Modal & functionality
 
 ## Minor Tasks
 
-- [ ] Hide Show clear button & remove select
+- [x] Hide Show clear button & remove select
   - [Home](src/routes/home.tsx)
   - [DataTable](src/components/table/DataTable.tsx)
-- [ ] Remove logoutRedirect for `Revoke Access` button
+- [x] Remove logoutRedirect for `Revoke Access` button
   - [Settings](src/routes/settings.tsx)
 
 ## Important Tasks
 
-- [ ] Customizeable (Tenant and Client) Microsoft Entra ID at Settings Page
+- [x] Customizeable (Tenant and Client) Microsoft Entra ID at Settings Page
   - [Settings](src/routes/settings.tsx)
 
-## Database Model
+## Models
 
 - Resource Group Name
   - `name`
