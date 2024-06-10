@@ -1,11 +1,13 @@
-import {open} from "@tauri-apps/plugin-dialog";
-import {toast} from "sonner";
-import {invoke} from "@tauri-apps/api/core";
-import {columns} from "@/components/table/columns";
-import {DataTable} from "@/components/table/DataTable";
-import {ColumnDef} from "@tanstack/react-table";
-import {useEffect, useState} from "react";
-import {basename, getSasToken, setSasToken} from "@/lib/utils";
+import { DataTable } from "@/components/table/DataTable";
+import { columns } from "@/components/table/columns";
+import { getAppData } from "@/lib/orm";
+import { basename, getSasToken, setSasToken } from "@/lib/utils";
+import { ColumnDef } from "@tanstack/react-table";
+import { invoke } from "@tauri-apps/api/core";
+import { open } from "@tauri-apps/plugin-dialog";
+import { Store } from "@tauri-apps/plugin-store";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export type TData = {
     file: string | "";
@@ -14,6 +16,18 @@ export type TData = {
 }
 
 const Home = () => {
+    const [appsData, setAppsData] = useState<any>(null);
+    useEffect(() => {
+        getAppData("appClientID").then((data) => {
+            setAppsData(data)
+        })
+        if (!appsData) {
+            const app = new Store('AppData.bin');
+            app.set("appClientID", "0000-00000-11111111111");
+            app.save();
+        }
+        console.log(appsData)
+    }, [])
     const [data, setData] = useState<TData[]>([]);
     const [loadFile, setLoadFile] = useState<true | false>(false);
     const [onlyLoaded, setOnlyLoaded] = useState<number>(0);
