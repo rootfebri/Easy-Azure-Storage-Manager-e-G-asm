@@ -26,9 +26,9 @@
   - `created_at`
   - `expired_at`
 - Access Token
-  - `access_token`
-  - `created_at`
-  - `expired_at`
+  - [x] `access_token`
+  - [x] `created_at`
+  - [x] `expired_on`
 - Azure Entra ID
   - `client_id`
   - `tenant_id`
