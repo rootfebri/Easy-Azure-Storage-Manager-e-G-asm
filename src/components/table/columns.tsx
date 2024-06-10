@@ -38,7 +38,7 @@ export const columns: ColumnDef<TColumns>[] = [
     {
         accessorKey: "file",
         header: ({column}) => <DataTableColumnHeader column={column} title="File"/>,
-        cell: ({row}) => <p className={"text-primary"}>{row.original.file.split("/")[row.original.file.split("/").length - 1] ?? row.original.file}</p>,
+        cell: ({row}) => <p className={"text-primary"}>{row.original.file.split("/")[row.original.file.split("/").length - 1] || row.original.file}</p>,
     },
     {
         accessorKey: "status",

@@ -35,7 +35,8 @@
     "store:allow-reset",
     "store:allow-save",
     "store:allow-set",
-    "store:allow-values"
+    "store:allow-values",
+    "window:default"
   ],
   "capabilities": []
 }

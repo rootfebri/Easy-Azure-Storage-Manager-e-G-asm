@@ -4,7 +4,7 @@ use crate::error::ErrorResponse;
 const SUBSCRIPTION_ENDPOINT: &str =
     "https://management.azure.com/subscriptions?api-version=2024-03-01";
 
-#[tauri::command]
+#[tauri::command(rename_all = "snake_case")]
 pub async fn get_subscriptions(access_token: String) -> Result<SubscriptionList, ErrorResponse> {
     let client = reqwest::Client::new();
     let response = client

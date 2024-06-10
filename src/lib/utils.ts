@@ -1,17 +1,10 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { invoke } from "@tauri-apps/api/core"
+import { getAccessToken } from "@/models/store"
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
-}
-
-export const getAccessToken = (): string => {
-    return <string>localStorage.getItem(import.meta.env.VITE_MSAL_STORAGE_KEY)
-}
-
-export const setAccessToken = (token: string) => {
-    localStorage.setItem(import.meta.env.VITE_MSAL_STORAGE_KEY, token)
 }
 
 export const getActiveRSN = (): string => {
@@ -36,9 +29,13 @@ type TResponse = {
  * @param sub string Subscription ID
  */
 export const setSasToken = (storage: string, sub: string): void => {
-    invoke('generate_sas', { sub, storage, res: getActiveRSN(), access_token: getAccessToken() })
-        .then((token) => localStorage.setItem(import.meta.env.VITE_SAS_STORAGE_KEY, (token as TResponse).accountSasToken))
-        .catch((err) => console.error(err.message ?? err))
+    getAccessToken().then((token) => {
+        if (token) {
+            invoke('generate_sas', { sub, storage, res: getActiveRSN(), access_token: token.value })
+                .then((token) => localStorage.setItem(import.meta.env.VITE_SAS_STORAGE_KEY, (token as TResponse).accountSasToken))
+                .catch((err) => console.error(err.message || err))
+        }
+    })
 }
 
 /**

@@ -1,14 +1,14 @@
-import {ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState,} from "@tanstack/react-table"
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table"
-import {useEffect, useState} from "react";
-import {Input} from "@/components/ui/input";
-import {DataTablePagination} from "@/components/table/DataTablePagination";
-import {DataTableViewOptions} from "@/components/table/DataTableViewOptions";
-import {Button} from "@/components/ui/button";
-import {FileDown, FilePlus, Trash2} from "lucide-react";
-import {TableActions} from "@/components/partials/table-actions.tsx";
-import {Storages, Subscriptions} from "@/azure";
-import {ListContainer} from "@/types/storage/list-container";
+import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState, } from "@tanstack/react-table"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
+import { useEffect, useState } from "react";
+import { Input } from "@/components/ui/input";
+import { DataTablePagination } from "@/components/table/DataTablePagination";
+import { DataTableViewOptions } from "@/components/table/DataTableViewOptions";
+import { Button } from "@/components/ui/button";
+import { FileDown, FilePlus, Trash2 } from "lucide-react";
+import { TableActions } from "@/components/partials/table-actions.tsx";
+import { Storages, Subscriptions } from "@/azure";
+import { ListContainer } from "@/types/storage/list-container";
 import { ClearSelected, UploadAll } from "@/components/partials/button-actions";
 import { TStateFn } from "@/types";
 
@@ -24,7 +24,7 @@ interface DataTableProps<TData, TValue> {
     setActiveContainer: TStateFn<string | null>
 }
 
-export const DataTable = <TData, TValue>({columns, data, uploadBtnState, fileLoader, setData, setIsUploading, setActiveSubscription, setActiveStorage, setActiveContainer}: DataTableProps<TData, TValue>) => {
+export const DataTable = <TData, TValue>({ columns, data, uploadBtnState, fileLoader, setData, setIsUploading, setActiveSubscription, setActiveStorage, setActiveContainer }: DataTableProps<TData, TValue>) => {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -49,8 +49,8 @@ export const DataTable = <TData, TValue>({columns, data, uploadBtnState, fileLoa
     });
 
     const [storage, setStorage] = useState<Storages>({ value: [] })
-    const [containers, setContainers] = useState<ListContainer>({value: []})
-    const [subscriptions, setSubscriptions] = useState<Subscriptions>({ count: {type: '', value: 0}, value: [] })
+    const [containers, setContainers] = useState<ListContainer>({ value: [] })
+    const [subscriptions, setSubscriptions] = useState<Subscriptions>({ count: { type: '', value: 0 }, value: [] })
     const [selectedDataForClearSelected, setSelectedDataForClearSelected] = useState<TData[]>([])
 
     useEffect(() => {
@@ -63,28 +63,28 @@ export const DataTable = <TData, TValue>({columns, data, uploadBtnState, fileLoa
                 <div className={"flex justify-evenly items-center gap-4"}>
                     <Input
                         placeholder={`Filter (Status | Filename)`}
-                        value={(table.getColumn("file")?.getFilterValue() as string) ?? ""}
+                        value={(table.getColumn("file")?.getFilterValue() as string) || ""}
                         onChange={(event) => table.getColumn("file")?.setFilterValue(event.target.value)}
                         className="max-w-sm"
                     />
-                    <Button onClick={() => fileLoader(true)} variant='ghost'><FilePlus size={20}/>&nbsp;Add File</Button>
-                    <Button variant='ghost'><FileDown size={20}/>&nbsp;Save to File</Button>
-                    <Button onClick={() => setData([])} variant='ghost'><Trash2 size={20}/>&nbsp;Clear Table</Button>
+                    <Button onClick={() => fileLoader(true)} variant='ghost'><FilePlus size={20} />&nbsp;Add File</Button>
+                    <Button variant='ghost'><FileDown size={20} />&nbsp;Save to File</Button>
+                    <Button onClick={() => setData([])} variant='ghost'><Trash2 size={20} />&nbsp;Clear Table</Button>
                 </div>
-                <DataTableViewOptions table={table as any}/>
+                <DataTableViewOptions table={table as any} />
             </div>
 
             <div className={"flex items-center gap-4 px-2 my-10 justify-between"}>
                 <TableActions
-                    subscriptions={subscriptions}
-                    setSubscriptions={setSubscriptions}
                     storage={storage}
-                    setStorage={setStorage}
                     containers={containers}
+                    setStorage={setStorage}
+                    subscriptions={subscriptions}
                     setContainers={setContainers}
                     setActiveStorage={setActiveStorage}
-                    setActiveSubscription={setActiveSubscription}
+                    setSubscriptions={setSubscriptions}
                     setActiveContainer={setActiveContainer}
+                    setActiveSubscription={setActiveSubscription}
                 />
                 <div className="flex items-center gap-4">
                     <UploadAll disabled={uploadBtnState} setIsUploading={setIsUploading} />
@@ -92,7 +92,7 @@ export const DataTable = <TData, TValue>({columns, data, uploadBtnState, fileLoa
                 </div>
             </div>
 
-            <DataTablePagination table={table}/>
+            <DataTablePagination table={table} />
 
             <div className="rounded-md border">
                 <Table>
@@ -139,7 +139,7 @@ export const DataTable = <TData, TValue>({columns, data, uploadBtnState, fileLoa
                 </Table>
             </div>
 
-            <DataTablePagination table={table}/>
+            <DataTablePagination table={table} />
         </div>
     );
 }

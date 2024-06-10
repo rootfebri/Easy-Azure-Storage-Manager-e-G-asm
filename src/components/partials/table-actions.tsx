@@ -1,18 +1,18 @@
-import {DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger} from "@/components/ui/dropdown-menu.tsx"
-import {Button} from "@/components/ui/button.tsx"
-import {cn, getAccessToken, getActiveRSN} from "@/lib/utils.ts"
-import {ClassValue} from "clsx"
-import {FC, useEffect, useState} from "react"
-import {Storages, StorageValue, Subscriptions, SubscriptionValue} from "@/azure"
-import {invoke} from "@tauri-apps/api/core"
-import {toast} from "sonner"
-import {BadgePlus} from "lucide-react"
-import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog.tsx"
-import {Label} from "@/components/ui/label.tsx"
-import {Input} from "@/components/ui/input.tsx"
-import {LoadingSpinner} from "@/components/partials/LoadingSpinner.tsx"
+import { BadgePlus } from "lucide-react"
+import { FC, useEffect, useState } from "react"
+import { Button } from "@/components/ui/button.tsx"
+import { ClassValue } from "clsx"
+import { ContainerData, ListContainer } from "@/types/storage/list-container"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog.tsx"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu.tsx"
+import { Input } from "@/components/ui/input.tsx"
+import { Label } from "@/components/ui/label.tsx"
+import { LoadingSpinner } from "@/components/partials/LoadingSpinner.tsx"
+import { StorageValue, Storages, SubscriptionValue, Subscriptions } from "@/azure"
+import { cn, getActiveRSN } from "@/lib/utils.ts"
+import { toast } from "sonner"
+import { useFetch } from "@/commands/invoker"
 import delay from "delay"
-import {ListContainer, ContainerData} from "@/types/storage/list-container";
 
 interface IClassWidht {
     classWidth?: ClassValue[] | ["w-56"]
@@ -42,14 +42,15 @@ interface CreateStorageProps {
 export type TSubscriptionList = TableActionProps & IClassWidht
 export type TStorageList = StorageListProps & IClassWidht
 
-export const SubscriptionList:FC<TSubscriptionList> = ({ name, data, setData, selectedSub, setSelectedSub, classWidth}) => {
+export const SubscriptionList: FC<TSubscriptionList> = ({ name, data, setData, selectedSub, setSelectedSub, classWidth }) => {
     const [fetchData, setFetchData] = useState<boolean>(false)
 
     useEffect(() => {
         if (fetchData) {
-            invoke('get_subscriptions', {accessToken: getAccessToken()})
-                .then((data) => setData(data as Subscriptions))
-                .catch(err => toast.error(err.message))
+            useFetch('get_subscriptions', {}, setData)
+                .catch(err => {
+                    toast.error(err.message ?? err)
+                })
                 .finally(() => setFetchData(false))
         }
     }, [fetchData])
@@ -61,7 +62,7 @@ export const SubscriptionList:FC<TSubscriptionList> = ({ name, data, setData, se
             </DropdownMenuTrigger>
             <DropdownMenuContent className={cn([classWidth, "overflow-auto", "max-h-64"])}>
                 <DropdownMenuLabel>Select {name}</DropdownMenuLabel>
-                <DropdownMenuSeparator/>
+                <DropdownMenuSeparator />
                 <DropdownMenuRadioGroup value={selectedSub.id} onValueChange={(value) => {
                     data.value.map((mapValue) => {
                         if (value === mapValue.id)
@@ -69,7 +70,7 @@ export const SubscriptionList:FC<TSubscriptionList> = ({ name, data, setData, se
                     })
                 }}>
                     {fetchData && (
-                        <LoadingSpinner/>
+                        <LoadingSpinner />
                     )}
                     {data.value.map((value, index) => (
                         <DropdownMenuRadioItem key={index} value={value.id}>{value.displayName}</DropdownMenuRadioItem>
@@ -80,14 +81,13 @@ export const SubscriptionList:FC<TSubscriptionList> = ({ name, data, setData, se
     )
 }
 
-export const StorageList:FC<TStorageList> = ({name, subscription_id, data, selectedStorage, setData, setSelectedStorage, openCreateStorage, classWidth}) => {
+export const StorageList: FC<TStorageList> = ({ name, subscription_id, data, selectedStorage, setData, setSelectedStorage, openCreateStorage, classWidth }) => {
     const [fetchData, setFetchData] = useState<boolean>(false)
 
     useEffect(() => {
         if (fetchData) {
-            invoke('get_storages', {subscription_id: `${subscription_id}`, access_token: `${getAccessToken()}`})
-                .then((data) => setData(data as Storages))
-                .catch(err => toast.error(err))
+            useFetch("get_storages", { subscription_id: subscription_id }, setData)
+                .catch(err => toast.error(err.message || err))
                 .finally(() => setFetchData(false))
         }
     }, [fetchData])
@@ -99,7 +99,7 @@ export const StorageList:FC<TStorageList> = ({name, subscription_id, data, selec
             </DropdownMenuTrigger>
             <DropdownMenuContent className={cn([classWidth, "overflow-auto", "max-h-64"])}>
                 <DropdownMenuLabel>Select {name}</DropdownMenuLabel>
-                <DropdownMenuSeparator/>
+                <DropdownMenuSeparator />
                 <DropdownMenuRadioGroup value={selectedStorage.name} onValueChange={(storageName) => {
                     data.value.map((storage) => {
                         if (storageName === storage.name) {
@@ -108,11 +108,11 @@ export const StorageList:FC<TStorageList> = ({name, subscription_id, data, selec
                     })
                 }}>
                     <DropdownMenuRadioItem onClick={() => openCreateStorage(true)} value="">
-                        <div className="flex items-center gap-x-2"><BadgePlus size={16}/>Create New</div>
+                        <div className="flex items-center gap-x-2"><BadgePlus size={16} />Create New</div>
                     </DropdownMenuRadioItem>
-                    <DropdownMenuSeparator/>
+                    <DropdownMenuSeparator />
                     {fetchData && (
-                        <LoadingSpinner/>
+                        <LoadingSpinner />
                     )}
                     {data.value.map((storage) => (
                         <DropdownMenuRadioItem key={storage.id} value={storage.name}>
@@ -124,12 +124,12 @@ export const StorageList:FC<TStorageList> = ({name, subscription_id, data, selec
         </DropdownMenu>
     )
 }
+
 export const CreateStorage: FC<CreateStorageProps> = ({ subscriptionId, open, setOpen }) => {
     const [fetchData, setFetchData] = useState<boolean>(false)
     const [resGrpName, setResGrpName] = useState<string>(getActiveRSN())
     const [accName, setAccName] = useState<string | undefined>()
     const [disable, setDisabled] = useState<boolean>(true)
-    const [is200, setIs200] = useState<boolean>(false)
 
     useEffect(() => {
         if (open && subscriptionId.length < 10) {
@@ -140,54 +140,40 @@ export const CreateStorage: FC<CreateStorageProps> = ({ subscriptionId, open, se
 
     useEffect(() => {
         if (fetchData) {
-            const url = `https://management.azure.com/subscriptions/${subscriptionId}/resourceGroups/${resGrpName}/providers/Microsoft.Storage/storageAccounts/${accName}?api-version=2023-01-01`
-            const body = {
-                kind: "StorageV2",
-                location: "Southeast Asia",
-                sku: {
-                    name: "Standard_GRS",
-                    tier: "Standard"
-                },
-                properties: {
-                    allowBlobPublicAccess: true,
-                    allowSharedKeyAccess: true,
-                    minimumTlsVersion: "TLS1_1",
-                }
-            }
-            let toastId = toast.loading("Creating storage account...")
-
-            invoke('create_storage', { data: body, url, access_token: getAccessToken() })
-                .then(async (res: any) => {
-                    toast.dismiss(toastId)
-                    if (res.message) {
-                        toastId = toast.loading(res.message)
-                        const checkStatus = async () => {
-                            while (!is200) {
-                                const lres: any = await invoke('create_storage', { url: url, access_token: getAccessToken(), data: body }).then((res) => res)
-                                if (!lres.message) {
-                                    toast.dismiss(toastId)
-                                    toast.success(`Storage ${accName} created successfully`)
-                                    setIs200(true)
-                                    break
-                                } else {
-                                    await delay(5000)
-                                }
-                            }
-                        }
-                        await checkStatus()
-                        setOpen(false)
-                    } else {
-                        toast.info("Perhaps this storage already yours?")
+            (async () => {
+                const [response, setResponse] = useState<{ message: string }>({ message: "" })
+                let toastId = toast.loading("Creating storage account...")
+                const url = `https://management.azure.com/subscriptions/${subscriptionId}/resourceGroups/${resGrpName}/providers/Microsoft.Storage/storageAccounts/${accName}?api-version=2023-01-01`
+                const body = {
+                    kind: "StorageV2",
+                    location: "Southeast Asia",
+                    sku: {
+                        name: "Standard_GRS",
+                        tier: "Standard"
+                    },
+                    properties: {
+                        allowBlobPublicAccess: true,
+                        allowSharedKeyAccess: true,
+                        minimumTlsVersion: "TLS1_1",
                     }
-                })
-                .catch(err => {
+                }
+                while (response.message !== "created") {
                     toast.dismiss(toastId)
-                    toast.error(err.message ?? err)
-                })
+                    toastId = toast.loading(response.message)
+                    await useFetch('create_storage', { url: url, data: body }, setResponse)
+                        .catch(err => {
+                            toast.dismiss(toastId)
+                            throw new Error(err)
+                        })
+                    await delay(3000)
+                }
+                toast.success(`Storage ${accName} created successfully`)
+                setOpen(false)
+                toast.dismiss(toastId)
+            })()
+                .catch(err => toast.error(err.message || err))
                 .finally(() => {
-                    toast.dismiss(toastId)
                     setFetchData(false)
-                    setIs200(false)
                 })
         }
     }, [fetchData])
@@ -235,7 +221,7 @@ export const CreateStorage: FC<CreateStorageProps> = ({ subscriptionId, open, se
                                     onChange={(inp) => setResGrpName(inp.currentTarget.value)}
                                     type="text"
                                     id="resourceGroupName"
-                                    defaultValue={getActiveRSN() ?? ""}
+                                    defaultValue={getActiveRSN() || ""}
                                 />
                             )}
                         </Label>
@@ -249,7 +235,6 @@ export const CreateStorage: FC<CreateStorageProps> = ({ subscriptionId, open, se
     )
 }
 
-
 interface ContainerListProps {
     name: string | undefined
     containers: ListContainer | undefined;
@@ -258,26 +243,24 @@ interface ContainerListProps {
     setCurrentData: (currentData: ContainerData) => void;
     require: {
         storage_name: string;
-        access_token: string;
         subscription_id: string;
         resource_group_name: string;
     }
 }
-export const ContainerList:FC<ContainerListProps & IClassWidht> = (props) => {
-    const {require, name, setContainers, containers, classWidth, currentData, setCurrentData} = props
+export const ContainerList: FC<ContainerListProps & IClassWidht> = (props) => {
+    const { require, name, setContainers, containers, classWidth, currentData, setCurrentData } = props
     const [fetchData, setFetchData] = useState<boolean>(false)
     useEffect(() => {
         if (fetchData) {
             setFetchData(false)
             if (require satisfies Required<ContainerListProps["require"]>) {
-                invoke('list_container', {
+                useFetch('list_container', {
                     storage_name: require.storage_name,
-                    access_token: getAccessToken(),
                     subscription_id: require.subscription_id,
                     resource_group_name: require.resource_group_name
-                }).then((resp) => {
-                    setContainers(resp as ListContainer)
-                }).catch(err => toast.error(err.message ?? err))
+                }, setContainers)
+                    .catch(err => toast.error(err.message || err))
+                    .finally(() => setFetchData(false))
             }
         }
     }, [fetchData])
@@ -297,13 +280,13 @@ export const ContainerList:FC<ContainerListProps & IClassWidht> = (props) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent className={cn([classWidth, "overflow-auto", "max-h-64"])}>
                 <DropdownMenuLabel>Select {name}</DropdownMenuLabel>
-                <DropdownMenuSeparator/>
+                <DropdownMenuSeparator />
                 <DropdownMenuRadioGroup value={currentData?.name} onValueChange={handleOnValueChange}>
-                    <DropdownMenuRadioItem onClick={() => {}} value="">
-                        <div className="flex items-center gap-x-2"><BadgePlus size={16}/>Create New</div>
+                    <DropdownMenuRadioItem onClick={() => { }} value="">
+                        <div className="flex items-center gap-x-2"><BadgePlus size={16} />Create New</div>
                     </DropdownMenuRadioItem>
-                    <DropdownMenuSeparator/>
-                    {fetchData && <LoadingSpinner/>}
+                    <DropdownMenuSeparator />
+                    {fetchData && <LoadingSpinner />}
                     {containers?.value?.map(container => (
                         <DropdownMenuRadioItem key={container.id} value={container.name}>{container.name}</DropdownMenuRadioItem>
                     ))}
@@ -313,27 +296,27 @@ export const ContainerList:FC<ContainerListProps & IClassWidht> = (props) => {
     )
 }
 
-export const CreateContainer = () => {}
+export const CreateContainer = () => { }
 
 interface TableActionsProps {
-    subscriptions: Subscriptions;
-    setSubscriptions: (subscriptions: Subscriptions) => void;
     storage: Storages;
-    setStorage: (storage: Storages) => void;
     containers: ListContainer;
+    subscriptions: Subscriptions;
+    setStorage: (storage: Storages) => void;
     setContainers: (containers: ListContainer) => void;
+    setSubscriptions: (subscriptions: Subscriptions) => void;
     setActiveStorage: (activeStorage: string | null) => void;
     setActiveContainer: (activeContainer: string | null) => void;
     setActiveSubscription: (activeSubscription: string | null) => void;
 }
 
 export const TableActions: FC<TableActionsProps> = ({
-    subscriptions,
-    setSubscriptions,
     storage,
-    setStorage,
     containers,
+    subscriptions,
+    setStorage,
     setContainers,
+    setSubscriptions,
     setActiveStorage,
     setActiveContainer,
     setActiveSubscription,
@@ -348,7 +331,7 @@ export const TableActions: FC<TableActionsProps> = ({
         setActiveContainer(selectedContainer.name)
         setActiveSubscription(selectedSub.subscriptionId)
     }, [selectedStorage, selectedSub, selectedContainer])
-    
+
     return (
         <div className="flex items-center gap-4 rounded-xl">
             <CreateStorage
@@ -375,7 +358,7 @@ export const TableActions: FC<TableActionsProps> = ({
                         name="Storage"
                     />
                     <ContainerList
-                        require={{ storage_name: selectedStorage.name, access_token: getAccessToken(), subscription_id: selectedSub.subscriptionId, resource_group_name: getActiveRSN() }}
+                        require={{ storage_name: selectedStorage.name, subscription_id: selectedSub.subscriptionId, resource_group_name: getActiveRSN() }}
                         name="Container"
                         setContainers={setContainers}
                         containers={containers}
