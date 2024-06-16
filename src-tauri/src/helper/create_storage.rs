@@ -10,7 +10,6 @@ pub async fn create_storage(
     url: String,
     access_token: String,
 ) -> Result<SuccessResponse, ErrorResponse> {
-
     let mut headers = HeaderMap::new();
     headers.insert("Content-Type", "application/json".parse().unwrap());
 
@@ -33,7 +32,6 @@ pub async fn create_storage(
             message: "created".to_string(),
         })
     } else {
-        let error_msg: ErrorResponse = response.json().await?;
-        Err(error_msg)
+        Err(response.json::<ErrorResponse>().await?)
     }
 }

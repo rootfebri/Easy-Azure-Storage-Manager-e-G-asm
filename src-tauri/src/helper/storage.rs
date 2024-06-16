@@ -2,7 +2,7 @@ use chrono::{Duration, SecondsFormat, Timelike, Utc};
 use reqwest::{Body, Client};
 
 use crate::azure::{
-    BodyForSas, ContainerCreated, CreateContainerBody, ListContainers, Props, SasToken,
+    BodyForSas, CreateContainerBody, ListContainers, Props, SasToken,
 };
 use crate::error::ErrorResponse;
 
@@ -45,27 +45,9 @@ pub async fn list_container(
     }
 }
 
-/// Creates a new container in the specified storage account.
-///
-/// # Arguments
-///
-/// * `access_token` - A string representing the Azure access token.
-/// * `sub` - A string representing the Azure subscription ID.
-/// * `res` - A string representing the Azure resource group name.
-/// * `con` - A string representing the storage account name.
-///
-/// # Returns
-///
-/// * `Result<ContainerCreated, ErrorResponse>` - On success, returns a `ContainerCreated` object containing information about the created container.
-///   On error, returns an `ErrorResponse` object containing details about the error.
 #[tauri::command(rename_all = "snake_case")]
-pub async fn create_container(
-    access_token: String,
-    sub: String,
-    res: String,
-    con: String,
-) -> Result<ContainerCreated, ErrorResponse> {
-    let url = format!("https://management.azure.com/subscriptions/{}/resourceGroups/{}/providers/Microsoft.Storage/storageAccounts/{}/blobServices/default/containers/web?api-version=2023-01-01", sub, res, con);
+pub async fn create_container(access_token: String, subscription_id: String, resource_group_name: String, storage_name:String, container_name: String) -> Result<u16, ErrorResponse> {
+    let url = format!("https://management.azure.com/subscriptions/{subscription_id}/resourceGroups/{resource_group_name}/providers/Microsoft.Storage/storageAccounts/{storage_name}/blobServices/default/containers/{container_name}?api-version=2023-01-01");
 
     let client = Client::new();
     let response = client
@@ -81,13 +63,7 @@ pub async fn create_container(
         .await
         .map_err(ErrorResponse::from)?;
 
-    if response.status().is_success() {
-        let result: ContainerCreated = response.json().await?;
-        Ok(result)
-    } else {
-        let error_message: ErrorResponse = response.json().await?;
-        Err(error_message)
-    }
+    Ok(response.status().as_u16())
 }
 
 /// Uploads a file to a specified Azure Blob Storage URL.
@@ -132,7 +108,6 @@ pub async fn put_blob(full_path_to_file: String, url: String) -> u16 {
 
     // Return the HTTP status code of the response
     let code = response.status().as_u16();
-    println!("HTTP status code: {}", code);
     code
 }
 

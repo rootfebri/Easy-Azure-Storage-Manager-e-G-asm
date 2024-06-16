@@ -16,8 +16,8 @@ import { getAppData } from "@/models/store";
 import HandleSetup from "@/HandleSetup"
 
 (async () => {
-    saveWindowState(StateFlags.ALL)
-    restoreStateCurrent(StateFlags.ALL)
+    await saveWindowState(StateFlags.ALL)
+    await restoreStateCurrent(StateFlags.ALL)
 
     const appData = await getAppData();
 
@@ -58,6 +58,8 @@ import HandleSetup from "@/HandleSetup"
                 created_at: Date.now(),
                 expired_on: Date.now() + 3600 * 1000
             } as AccessToken)
+
+            window.location.href = '/settings'
         }
     });
 

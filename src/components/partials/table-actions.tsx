@@ -1,17 +1,17 @@
-import { BadgePlus } from "lucide-react"
-import { FC, useEffect, useState } from "react"
-import { Button } from "@/components/ui/button.tsx"
-import { ClassValue } from "clsx"
-import { ContainerData, ListContainer } from "@/types/storage/list-container"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog.tsx"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu.tsx"
-import { Input } from "@/components/ui/input.tsx"
-import { Label } from "@/components/ui/label.tsx"
-import { LoadingSpinner } from "@/components/partials/LoadingSpinner.tsx"
-import { StorageValue, Storages, SubscriptionValue, Subscriptions } from "@/azure"
-import { cn, getActiveRSN } from "@/lib/utils.ts"
-import { toast } from "sonner"
-import { useFetch } from "@/commands/invoker"
+import {BadgePlus} from "lucide-react"
+import {FC, useEffect, useState} from "react"
+import {Button} from "@/components/ui/button.tsx"
+import {ClassValue} from "clsx"
+import {ContainerData, ListContainer} from "@/types/storage/list-container"
+import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog.tsx"
+import {DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger} from "@/components/ui/dropdown-menu.tsx"
+import {Input} from "@/components/ui/input.tsx"
+import {Label} from "@/components/ui/label.tsx"
+import {LoadingSpinner} from "@/components/partials/LoadingSpinner.tsx"
+import {Storages, StorageValue, Subscriptions, SubscriptionValue} from "@/azure"
+import {cn, getActiveRSN} from "@/lib/utils.ts"
+import {toast} from "sonner"
+import {useFetch} from "@/commands/invoker"
 import delay from "delay"
 
 interface IClassWidht {
@@ -273,27 +273,64 @@ export const ContainerList: FC<ContainerListProps & IClassWidht> = (props) => {
         })
     }
 
+    const [isCreatingContainer, setCreatingContainer] = useState<boolean>(false)
+    const [newCtrName, setNewCtrName] = useState<string>("")
+    const [useFetchResponse, setUseFetchResponse] = useState<any>()
+    useEffect(() => {
+        if (useFetchResponse) {
+            if (typeof useFetchResponse === 'number' && useFetchResponse >= 200 && useFetchResponse <= 299) {
+                toast.success('Container created successfully')
+            } else {
+                toast.warning(useFetchResponse)
+            }
+        }
+    }, [useFetchResponse]);
+
     return (
-        <DropdownMenu onOpenChange={setFetchData}>
-            <DropdownMenuTrigger asChild>
-                <Button variant="outline">{currentData?.name || "Select Container"}</Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className={cn([classWidth, "overflow-auto", "max-h-64"])}>
-                <DropdownMenuLabel>Select {name}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuRadioGroup value={currentData?.name} onValueChange={handleOnValueChange}>
-                    <DropdownMenuRadioItem onClick={() => { }} value="">
-                        <div className="flex items-center gap-x-2"><BadgePlus size={16} />Create New</div>
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuSeparator />
-                    {fetchData && <LoadingSpinner />}
-                    {containers?.value?.map(container => (
-                        <DropdownMenuRadioItem key={container.id} value={container.name}>{container.name}</DropdownMenuRadioItem>
-                    ))}
-                </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-        </DropdownMenu>
-    )
+        <div className="flex flex-col items-center gap-2">
+            {!isCreatingContainer
+                ?
+                <Button variant="outline" onClick={() => setCreatingContainer(true)} className="flex items-center gap-x-2"><BadgePlus size={16}/>Create New</Button>
+                :
+                <div className="relative">
+                    <Input
+                        type="text"
+                        onChange={(e) => setNewCtrName(e.currentTarget.value)}
+                        onBlur={() => setCreatingContainer(false)}
+                        onAbort={() => setCreatingContainer(false)}
+                        placeholder="name (Enter to submit)"
+                        value={newCtrName}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                const toaster = toast.loading("Creating container...")
+                                useFetch('create_container', { ...require, container_name: newCtrName }, setUseFetchResponse)
+                                    .finally(() => {
+                                        toast.dismiss(toaster)
+                                        setCreatingContainer(false)
+                                        setNewCtrName("")
+                                    })
+                            }
+                        }}
+                    />
+                </div>
+            }
+            <DropdownMenu onOpenChange={setFetchData}>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="outline">{currentData?.name || "Select Container"}</Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className={cn([classWidth, "overflow-auto", "max-h-64"])}>
+                    <DropdownMenuLabel>Select {name}</DropdownMenuLabel>
+                    <DropdownMenuSeparator/>
+                    <DropdownMenuRadioGroup value={currentData?.name} onValueChange={handleOnValueChange}>
+                        {fetchData && <LoadingSpinner/>}
+                        {containers?.value?.map(container => (
+                            <DropdownMenuRadioItem key={container.id} value={container.name}>{container.name}</DropdownMenuRadioItem>
+                        ))}
+                    </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+            </DropdownMenu>
+        </div>
+    );
 }
 
 export const CreateContainer = () => { }

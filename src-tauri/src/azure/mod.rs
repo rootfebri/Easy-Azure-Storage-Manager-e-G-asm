@@ -6,7 +6,7 @@ mod sas_token;
 mod storage_list;
 pub mod subscription_list;
 
-pub use create_container_response::{ContainerCreated, CreateContainerBody, Props};
+pub use create_container_response::{CreateContainerBody, Props};
 pub use list_container_response::ListContainers;
 pub use new_storage_data::NewStorageData;
 pub use new_storage_response::SuccessResponse;

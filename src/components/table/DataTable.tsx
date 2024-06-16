@@ -1,16 +1,17 @@
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState, } from "@tanstack/react-table"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
-import { useEffect, useState } from "react";
-import { Input } from "@/components/ui/input";
-import { DataTablePagination } from "@/components/table/DataTablePagination";
-import { DataTableViewOptions } from "@/components/table/DataTableViewOptions";
-import { Button } from "@/components/ui/button";
-import { FileDown, FilePlus, Trash2 } from "lucide-react";
-import { TableActions } from "@/components/partials/table-actions.tsx";
-import { Storages, Subscriptions } from "@/azure";
-import { ListContainer } from "@/types/storage/list-container";
-import { ClearSelected, UploadAll } from "@/components/partials/button-actions";
-import { TStateFn } from "@/types";
+import {ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState,} from "@tanstack/react-table"
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table"
+import {useEffect, useState} from "react";
+import {Input} from "@/components/ui/input";
+import {DataTablePagination} from "@/components/table/DataTablePagination";
+import {DataTableViewOptions} from "@/components/table/DataTableViewOptions";
+import {Button} from "@/components/ui/button";
+import {Copy, FilePlus, Trash2} from "lucide-react";
+import {TableActions} from "@/components/partials/table-actions.tsx";
+import {Storages, Subscriptions} from "@/azure";
+import {ListContainer} from "@/types/storage/list-container";
+import {ClearSelected, UploadAll} from "@/components/partials/button-actions";
+import {TStateFn} from "@/types";
+import {writeText} from '@tauri-apps/plugin-clipboard-manager';
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -48,6 +49,7 @@ export const DataTable = <TData, TValue>({ columns, data, uploadBtnState, fileLo
         },
     });
 
+    const [isCopying, setIsCopying] = useState<boolean>(false);
     const [storage, setStorage] = useState<Storages>({ value: [] })
     const [containers, setContainers] = useState<ListContainer>({ value: [] })
     const [subscriptions, setSubscriptions] = useState<Subscriptions>({ count: { type: '', value: 0 }, value: [] })
@@ -56,6 +58,19 @@ export const DataTable = <TData, TValue>({ columns, data, uploadBtnState, fileLo
     useEffect(() => {
         setSelectedDataForClearSelected(table.getSelectedRowModel().rows.map((row) => row.original))
     }, [table.getSelectedRowModel().rows])
+
+    useEffect(() => {
+        if (isCopying) {
+            console.log("Copying")
+            // @ts-ignore
+            const selectedRows = table.getRowModel().rows.map((row) => row.original.url)
+            const data = selectedRows.join("\n")
+            writeText(data)
+                .finally(() => setTimeout(() => {
+                    setIsCopying(false)
+                }, 1000))
+        }
+    }, [isCopying]);
 
     return (
         <div className="my-4">
@@ -68,10 +83,10 @@ export const DataTable = <TData, TValue>({ columns, data, uploadBtnState, fileLo
                         className="max-w-sm"
                     />
                     <Button onClick={() => fileLoader(true)} variant='ghost'><FilePlus size={20} />&nbsp;Add File</Button>
-                    <Button variant='ghost'><FileDown size={20} />&nbsp;Save to File</Button>
+                    <Button onClick={() => setIsCopying(true)} variant='ghost' disabled={isCopying}><Copy size={20} />&nbsp;Copy Generated URLs</Button>
                     <Button onClick={() => setData([])} variant='ghost'><Trash2 size={20} />&nbsp;Clear Table</Button>
                 </div>
-                <DataTableViewOptions table={table as any} />
+                <DataTableViewOptions table={table} />
             </div>
 
             <div className={"flex items-center gap-4 px-2 my-10 justify-between"}>

@@ -9,3 +9,7 @@ export interface AccessToken {
     created_at: number;
     expired_on: number;
 }
+
+export interface SasToken {
+    accountSasToken: string;
+}
