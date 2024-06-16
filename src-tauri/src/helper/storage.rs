@@ -86,9 +86,34 @@ pub async fn put_blob(full_path_to_file: String, url: String) -> u16 {
     use std::fs::File;
     use std::io::Read;
 
+
+    let content_type = match full_path_to_file.as_str() {
+        file if file.ends_with(".html") => "text/html",
+        file if file.ends_with(".htm") => "text/html",
+        file if file.ends_with(".css") => "text/css",
+        file if file.ends_with(".js") => "application/javascript",
+        file if file.ends_with(".json") => "application/json",
+        file if file.ends_with(".wasm") => "application/wasm",
+        file if file.ends_with(".png") => "image/png",
+        file if file.ends_with(".jpg") => "image/jpeg",
+        file if file.ends_with(".svg") => "image/svg+xml",
+        file if file.ends_with(".txt") => "text/plain",
+        file if file.ends_with(".xml") => "text/xml",
+        file if file.ends_with(".pdf") => "application/pdf",
+        file if file.ends_with(".mp4") => "video/mp4",
+        file if file.ends_with(".mkv") => "video/x-matroska",
+        file if file.ends_with(".avi") => "video/x-msvideo",
+        file if file.ends_with(".mov") => "video/x-quicktime",
+        file if file.ends_with(".wmv") => "video/x-ms-wmv",
+        file if file.ends_with(".flv") => "video/x-flv",
+        file if file.ends_with(".webm") => "video/x-webm",
+        file if file.ends_with(".ogg") => "video/x-ogg",
+        _ => "application/octet-stream",
+    }.to_string();
+
     // Read the file into a buffer
     let mut file_buf = Vec::new();
-    File::open(full_path_to_file)
+    File::open(full_path_to_file.clone())
         .expect("error while opening file")
         .read_to_end(&mut file_buf)
         .expect("error while reading file");
@@ -99,7 +124,7 @@ pub async fn put_blob(full_path_to_file: String, url: String) -> u16 {
     // Make the PUT request to the specified URL
     let response = client
         .put(url)
-        .header("Content-Type", "text/html")
+        .header("Content-Type", content_type)
         .header("x-ms-blob-type", "BlockBlob")
         .body(Body::from(file_buf))
         .send()
@@ -206,7 +231,5 @@ fn generate_signed_times(hours_ahead: i64, days_ahead: i64) -> (String, String) 
         .with_nanosecond(0)
         .unwrap()
         .to_rfc3339_opts(SecondsFormat::Secs, true);
-    println!("Start: {}, Expiry: {}", signed_start, signed_expiry);
-
     (signed_start, signed_expiry)
 }

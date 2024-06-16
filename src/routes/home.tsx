@@ -24,15 +24,19 @@ const Home = () => {
     const [activeSubscription, setActiveSubscription] = useState<string | null>(null);
 
     const openFileLoader = async () => {
+        const lastPath = localStorage.getItem("lastPath") || ".";
         const files = await open({
             multiple: true,
             title: "Select Files",
             filters: [{
-                extensions: ["html", "html5", "htm"],
+                extensions: ["html", "html5", "htm", 'xml'],
                 name: ""
             }],
-            defaultPath: ".",
+            defaultPath: lastPath,
         });
+        if (files) {
+            localStorage.setItem("lastPath", files[0].path);
+        }
 
         setData((prevState) => {
             const newState = [...prevState];
@@ -54,51 +58,55 @@ const Home = () => {
     }, [loadFile]);
 
     const [newSasToken, setNewSasToken] = useState<SasToken>({accountSasToken: ""});
+    const upload = async () => {
+        const toaster = toast.loading("Uploading...")
+        setTimeout(() => {
+            const {accountSasToken} = newSasToken
+            if (accountSasToken.length < 1) {
+                toast.dismiss(toaster)
+                toast.info("No SAS token found, try again")
+                return
+            }
+            data.map((fileToUpload) => {
+                if (fileToUpload.status === 'uploaded') return;
+                setData((prevState) => prevState.map((item) => {
+                    if (item.file === fileToUpload.file) {
+                        return { ...item, status: 'uploading' }
+                    }
+                    return item;
+                }))
+
+                const fileName = basename(fileToUpload.file)
+                const url = `https://${activeStorage}.blob.core.windows.net/${activeContainer}/${fileName}`
+
+                invoke<number | string>('put_blob', { url: `${url}?${accountSasToken}` , full_path_to_file: fileToUpload.file })
+                    .then((resp) => {
+                        if (resp as number >= 200 && resp as number <= 209) {
+                            setData((prevState) => prevState.map((item) => {
+                                if (item.file === fileToUpload.file) {
+                                    return { ...item, status: 'uploaded', url: url }
+                                }
+                                return item;
+                            }))
+                        }
+                        else {
+                            setData((prevState) => prevState.map((item) => {
+                                if (item.file === fileToUpload.file) {
+                                    return { ...item, status: 'failed', url: '-' }
+                                }
+                                return item;
+                            }))
+                        }
+                    })
+            })
+            toast.dismiss(toaster)
+            toast.success("Done!")
+        }, 1500)
+    }
     useEffect(() => {
         if (isUploading && data.length > 0 && activeStorage && activeSubscription && activeContainer) {
             useFetch('generate_sas', {storage: activeStorage, sub: activeSubscription, res: getActiveRSN()}, setNewSasToken)
-                .then(() => {
-                    const {accountSasToken} = newSasToken
-                    data.map((fileToUpload) => {
-                        if (fileToUpload.status === 'uploaded') return;
-                        setData((prevState) => prevState.map((item) => {
-                            if (item.file === fileToUpload.file) {
-                                return { ...item, status: 'uploading' }
-                            }
-                            return item;
-                        }))
-
-                        const fileName = basename(fileToUpload.file)
-                        const url = `https://${activeStorage}.blob.core.windows.net/${activeContainer}/${fileName}`
-
-                        invoke<number | string>('put_blob', { url: `${url}?${accountSasToken}` , full_path_to_file: fileToUpload.file })
-                            .then((resp) => {
-                                if (resp as number >= 200 && resp as number <= 209) {
-                                    setData((prevState) => prevState.map((item) => {
-                                        if (item.file === fileToUpload.file) {
-                                            return { ...item, status: 'uploaded', url: url }
-                                        }
-                                        return item;
-                                    }))
-                                }
-                                else {
-                                    setData((prevState) => prevState.map((item) => {
-                                        if (item.file === fileToUpload.file) {
-                                            return { ...item, status: 'failed', url: '-' }
-                                        }
-                                        return item;
-                                    }))
-
-                                    throw new Error(resp as string)
-                                }
-                            })
-                            .catch((error) => {
-                                const message = `Error uploading ${fileToUpload.file} to ${activeStorage}: ${error.message || error}`
-                                toast.error(message)
-                            })
-                    })
-                    setIsUploading(false)
-                })
+            upload().finally(() => setIsUploading(false))
         }
     }, [isUploading]);
 

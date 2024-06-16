@@ -130,6 +130,7 @@ export const CreateStorage: FC<CreateStorageProps> = ({ subscriptionId, open, se
     const [resGrpName, setResGrpName] = useState<string>(getActiveRSN())
     const [accName, setAccName] = useState<string | undefined>()
     const [disable, setDisabled] = useState<boolean>(true)
+    const [response, setResponse] = useState<{ message: string }>({ message: "" })
 
     useEffect(() => {
         if (open && subscriptionId.length < 10) {
@@ -141,7 +142,6 @@ export const CreateStorage: FC<CreateStorageProps> = ({ subscriptionId, open, se
     useEffect(() => {
         if (fetchData) {
             (async () => {
-                const [response, setResponse] = useState<{ message: string }>({ message: "" })
                 let toastId = toast.loading("Creating storage account...")
                 const url = `https://management.azure.com/subscriptions/${subscriptionId}/resourceGroups/${resGrpName}/providers/Microsoft.Storage/storageAccounts/${accName}?api-version=2023-01-01`
                 const body = {
