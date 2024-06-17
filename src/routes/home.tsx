@@ -1,6 +1,6 @@
 import {DataTable} from "@/components/table/DataTable";
 import {columns} from "@/components/table/columns";
-import {basename, getActiveRSN} from "@/lib/utils";
+import {basename} from "@/lib/utils";
 import {ColumnDef} from "@tanstack/react-table";
 import {invoke} from "@tauri-apps/api/core";
 import {open} from "@tauri-apps/plugin-dialog";
@@ -8,6 +8,7 @@ import {useEffect, useState} from "react";
 import {toast} from "sonner";
 import {useFetch} from "@/commands/invoker.ts";
 import {SasToken} from "@/models/models.ts";
+import {getResourceGroup} from "@/models/store.ts";
 
 export type TData = {
     file: string | "";
@@ -103,9 +104,18 @@ const Home = () => {
             toast.success("Done!")
         }, 1500)
     }
+    const [resourceGroupName, setResourceGroupName] = useState<string>("");
+    useEffect(() => {
+        const fetchData = async () => {
+            const data = await getResourceGroup()
+            setResourceGroupName(data.value)
+        }
+        fetchData().finally()
+    }, [resourceGroupName])
+
     useEffect(() => {
         if (isUploading && data.length > 0 && activeStorage && activeSubscription && activeContainer) {
-            useFetch('generate_sas', {storage: activeStorage, sub: activeSubscription, res: getActiveRSN()}, setNewSasToken)
+            useFetch('generate_sas', {storage: activeStorage, sub: activeSubscription, res: resourceGroupName}, setNewSasToken).finally()
             upload().finally(() => setIsUploading(false))
         }
     }, [isUploading]);

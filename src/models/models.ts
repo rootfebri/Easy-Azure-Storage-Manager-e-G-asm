@@ -13,3 +13,7 @@ export interface AccessToken {
 export interface SasToken {
     accountSasToken: string;
 }
+
+export interface ResourceGroupName {
+    value: string;
+}

@@ -9,10 +9,11 @@ import {Input} from "@/components/ui/input.tsx"
 import {Label} from "@/components/ui/label.tsx"
 import {LoadingSpinner} from "@/components/partials/LoadingSpinner.tsx"
 import {Storages, StorageValue, Subscriptions, SubscriptionValue} from "@/azure"
-import {cn, getActiveRSN} from "@/lib/utils.ts"
+import {cn} from "@/lib/utils.ts"
 import {toast} from "sonner"
 import {useFetch} from "@/commands/invoker"
 import delay from "delay"
+import {getResourceGroup} from "@/models/store.ts";
 
 interface IClassWidht {
     classWidth?: ClassValue[] | ["w-56"]
@@ -127,10 +128,18 @@ export const StorageList: FC<TStorageList> = ({ name, subscription_id, data, sel
 
 export const CreateStorage: FC<CreateStorageProps> = ({ subscriptionId, open, setOpen }) => {
     const [fetchData, setFetchData] = useState<boolean>(false)
-    const [resGrpName, setResGrpName] = useState<string>(getActiveRSN())
+    const [resGrpName, setResGrpName] = useState<string>("")
     const [accName, setAccName] = useState<string | undefined>()
     const [disable, setDisabled] = useState<boolean>(true)
     const [response, setResponse] = useState<{ message: string }>({ message: "" })
+
+    useEffect(() => {
+        const asyncFetch = async () => {
+            const resourceGroupName = await getResourceGroup()
+            setResGrpName(resourceGroupName.value)
+        }
+        asyncFetch().finally()
+    }, []);
 
     useEffect(() => {
         if (open && subscriptionId.length < 10) {
@@ -206,22 +215,22 @@ export const CreateStorage: FC<CreateStorageProps> = ({ subscriptionId, open, se
                         </Label>
                         <Label>
                             <h1>
-                                {getActiveRSN()?.length > 0 ? "Resource Group Name (Got from setting)" : "Enter resource group name"}
+                                Enter resource group name
                             </h1>
-                            {getActiveRSN()?.length > 0 ? (
+                            {resGrpName.length > 0 ? (
                                 <Input
-                                    onChange={(inp) => setResGrpName(inp.currentTarget.value)}
+                                    onChange={(e) => setResGrpName(e.currentTarget.value)}
                                     disabled={true}
-                                    value={getActiveRSN()}
+                                    value={resGrpName}
                                     type="text"
                                     id="resourceGroupName"
                                 />
                             ) : (
                                 <Input
-                                    onChange={(inp) => setResGrpName(inp.currentTarget.value)}
+                                    onChange={(e) => setResGrpName(e.currentTarget.value)}
                                     type="text"
                                     id="resourceGroupName"
-                                    defaultValue={getActiveRSN() || ""}
+                                    defaultValue={resGrpName}
                                 />
                             )}
                         </Label>
@@ -333,8 +342,6 @@ export const ContainerList: FC<ContainerListProps & IClassWidht> = (props) => {
     );
 }
 
-export const CreateContainer = () => { }
-
 interface TableActionsProps {
     storage: Storages;
     containers: ListContainer;
@@ -362,6 +369,16 @@ export const TableActions: FC<TableActionsProps> = ({
     const [selectedStorage, setSelectedStorage] = useState<StorageValue>({ name: "" } as StorageValue);
     const [selectedContainer, setSelectedContainer] = useState<ContainerData>({ name: "" } as ContainerData);
     const [openCreateStorage, setOpenCreateStorage] = useState<boolean>(false);
+
+    const [resourceGroupName, setResourceGroupName] = useState<string>("")
+    useEffect(() => {
+        const fetchData = async () => {
+            const data = await getResourceGroup()
+            setResourceGroupName(data.value)
+        }
+
+        fetchData().finally()
+    }, [resourceGroupName]);
 
     useEffect(() => {
         setActiveStorage(selectedStorage.name)
@@ -395,7 +412,7 @@ export const TableActions: FC<TableActionsProps> = ({
                         name="Storage"
                     />
                     <ContainerList
-                        require={{ storage_name: selectedStorage.name, subscription_id: selectedSub.subscriptionId, resource_group_name: getActiveRSN() }}
+                        require={{ storage_name: selectedStorage.name, subscription_id: selectedSub.subscriptionId, resource_group_name: resourceGroupName }}
                         name="Container"
                         setContainers={setContainers}
                         containers={containers}

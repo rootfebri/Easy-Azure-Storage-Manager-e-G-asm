@@ -61,7 +61,6 @@ export const DataTable = <TData, TValue>({ columns, data, uploadBtnState, fileLo
 
     useEffect(() => {
         if (isCopying) {
-            console.log("Copying")
             // @ts-ignore
             const selectedRows = table.getRowModel().rows.map((row) => row.original.url)
             const data = selectedRows.join("\n")
@@ -103,7 +102,7 @@ export const DataTable = <TData, TValue>({ columns, data, uploadBtnState, fileLo
                 />
                 <div className="flex items-center gap-4">
                     <UploadAll disabled={uploadBtnState} setIsUploading={setIsUploading} />
-                    <ClearSelected data={data} selected={selectedDataForClearSelected} setData={setData} />
+                    <ClearSelected resetter={table.resetRowSelection} data={data} selected={selectedDataForClearSelected} setData={setData} />
                 </div>
             </div>
 

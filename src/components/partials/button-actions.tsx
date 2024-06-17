@@ -5,14 +5,16 @@ interface ClearSelectedProps<TData> {
     data: TData[]
     selected: TData[]
     setData: TStateFn<TData[]>
+    resetter: any
 }
-export const ClearSelected = <TData,>({data, selected, setData}: ClearSelectedProps<TData>) => {
+export const ClearSelected = <TData,>({data, selected, setData, resetter}: ClearSelectedProps<TData>) => {
     const clearSelected = () => {
         setData(data.filter((item) => !selected.includes(item)))
+        resetter()
     }
 
     return (
-        <Button disabled={selected.length < 1} variant="destructive" size='sm' onClick={clearSelected}>Clear Selected</Button>
+        <Button disabled={selected.length < 1} variant="destructive" size='sm' onClick={clearSelected}>Remove</Button>
     )
 }
 
